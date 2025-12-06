@@ -35,6 +35,7 @@ def build_huffman_tree(str text):
     return heapq.heappop(heap)
 
 def char_to_bit(Node node):
+    # Generate Huffman codes via tree traversal
     cdef list waiting = [(node, "")]
     cdef dict code = {}
     cdef Node curr
@@ -50,6 +51,7 @@ def char_to_bit(Node node):
     return code
 
 def bin_to_byte(str bin_str):
+    # Convert binary string to bytes
     cdef int pad_len = (8 - len(bin_str) % 8) % 8
     bin_str += "0" * pad_len
     cdef bytearray byte_arr = bytearray()
@@ -94,7 +96,6 @@ def decode(str bin_str, dict code):
     return "".join(result)
 
 def compressor(data):
-    # Convert bytes to string
     cdef str text
     if isinstance(data, bytes):
         text = data.decode('latin-1')
@@ -105,7 +106,7 @@ def compressor(data):
     cdef dict coder = char_to_bit(tree)
     cdef str bin_str = encode(text, coder)
     
-    # Build metadata more efficiently
+    # Build metadata
     cdef list parts = [
         str(len(bin_str)), '\n',
         str(len(coder)), '\n'
@@ -127,6 +128,7 @@ def decompressor(data):
     cdef int meta_end = byte_string.find('\n\n')
     cdef bytes payload = byte_string[meta_end + 2:].encode('latin-1')
 
+    # Parse metadata
     cdef list temp = byte_string[:meta_end].split("\n")
     cdef int og_len = int(temp[0])
     cdef int coder_len = int(temp[1])
