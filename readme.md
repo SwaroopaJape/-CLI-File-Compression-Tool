@@ -37,11 +37,24 @@ file_compressor_tool_project/
 
 ## Running the Compressor Tool
 
-### 1. Build the Cython Modules (Required)
-Before using the compressor, run:
-
 ```bash
+# step 1: setup the cython files
+cd compressor_tool
 pip install cython
-python3 compressor_tool/setup.py build_ext --inplace
-# now run the tool
-python3 compressor_tool/cli.py <path> <algo> <dest_dir> [output_name]
+python3 setup.py build_ext --inplace
+cd ..
+
+# step 2: run the tool
+# to compress:   
+python3 cli.py <algo> <path> [dest_dir] [name]
+# or
+python3 path/to/cli.py <algo> <path> [dest_dir] [name]
+# algo: rle | hce | lz77 | defl
+
+# to decompress: 
+python3 cli.py decompress <compressed_file> [dest_dir] [name]
+# or
+python3 path/to/cli.py decompress <compressed_file> [dest_dir] [name]
+
+# step 3: run the benchmark
+python3 test_benchmark.py
