@@ -1,5 +1,6 @@
 # cython: boundscheck=False, wraparound=False
 
+# function to comvert data to string and return bytes of rle encoding
 def compressor(bytes data):
     cdef int n = len(data)
     if n == 0:
@@ -21,12 +22,12 @@ def compressor(bytes data):
             curr = byte
             count = 1
     
-    # Don't forget the last run
     comp.append(curr)
     comp.append(count)
     
     return bytes(comp)
 
+# get back the actual data from byte data
 def decompressor(data):
     cdef list tokens = list(data) if not isinstance(data, list) else data
     cdef int n = len(tokens)
