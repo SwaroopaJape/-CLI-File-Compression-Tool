@@ -2,11 +2,13 @@ import sys
 import os
 from compressor import rle, hce, lz77, defl
 
+# function to compress a single file
 def compress_file(file_loc, algo, dest_dir, name):
     file = open(file_loc, "rb")
     data = file.read()
     file.close()
 
+    # get file extension
     temp = file_loc.split(".")
     ext = "\n"
     if len(temp)>1:
@@ -33,6 +35,7 @@ def compress_file(file_loc, algo, dest_dir, name):
 
     return
 
+# function to compress a folder
 def compress_folder(dir_loc, algo, dest_dir, name):
     stack = [dir_loc]
     files_to_process = []
@@ -48,7 +51,7 @@ def compress_folder(dir_loc, algo, dest_dir, name):
                 elif entry.is_file():
                     files_to_process.append(entry.path)
 
-    # Metadata construction
+    # metadata construction
     parts = [
         str(len(files_to_process)), '\n'
     ]
@@ -73,7 +76,6 @@ def compress_folder(dir_loc, algo, dest_dir, name):
         rel_path = os.path.relpath(file_path, base_path)
         comp_size = len(byte_str)
 
-        # Dictionary entry style: path\nsize\n
         parts.append(rel_path)
         parts.append('\n')
         parts.append(str(comp_size))
@@ -95,9 +97,12 @@ def compress_folder(dir_loc, algo, dest_dir, name):
 
     return
 
+# function to decompress a single file
 def decompress_file(file_loc, dest_dir, name):
     algo = ""
     temp = file_loc.split(".")
+
+    # get algorithm
     if(len(temp)>1):
         algo = temp[1][4:]
 
@@ -105,6 +110,7 @@ def decompress_file(file_loc, dest_dir, name):
     data = list(file.read())
     file.close()
 
+    # get file extension
     ext = ""
     i = 0
     n = len(data)
@@ -132,6 +138,7 @@ def decompress_file(file_loc, dest_dir, name):
 
     return
 
+# function to decompress a folder
 def decompress_folder(file_loc, dest_dir, name):
     algo = ""
     temp = file_loc.split(".")
@@ -146,6 +153,7 @@ def decompress_folder(file_loc, dest_dir, name):
     with open(file_loc, "rb") as f:
         data = f.read()
 
+    # find header and body separator
     sep = b'\n\n'
     idx = data.find(sep)
     if idx == -1:
@@ -204,6 +212,7 @@ def decompress_folder(file_loc, dest_dir, name):
 
     return
 
+# CLI usage
 def usage():
     print("Usage:")
     print("  To compress:   cli.py <algo> <path> [dest_dir] [name]")
@@ -211,21 +220,25 @@ def usage():
     print("  To decompress: cli.py decompress <compressed_file> [dest_dir] [name]")
     sys.exit(1)
 
+# helper to get default name from path
 def _default_name_from_path(path):
     base = os.path.basename(path)
     if '.' in base:
         return base.split('.')[0]
     return base
 
+# main function
 def main():
     if len(sys.argv) < 3:
         usage()
 
+    # parse command line arguments
     cmd = sys.argv[1]
     path = sys.argv[2]
     dest_dir = sys.argv[3] if len(sys.argv) > 3 else "."
     name_arg = sys.argv[4] if len(sys.argv) > 4 else None
 
+    # handle decompression
     if cmd.lower() == "decompress":
         if not os.path.isfile(path):
             raise Exception("Compressed file does not exist.")
@@ -236,6 +249,7 @@ def main():
             decompress_file(path, dest_dir, out_name)
         return
 
+    # handle compression
     algo = cmd.lower()
     if algo not in ("rle", "hce", "lz77", "defl"):
         raise Exception(f"Unknown algorithm: {algo}")
