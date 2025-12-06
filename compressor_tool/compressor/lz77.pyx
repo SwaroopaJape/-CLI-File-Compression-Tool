@@ -3,6 +3,7 @@
 cdef int W = 4096
 cdef int L = 255
 
+# implementation of the lz77 algorithm encoding that converts the data to tokens and return bytes
 def compressor(bytes data, int ws=W, int lb=L):
     cdef int n = len(data)
     cdef int i = 0
@@ -50,6 +51,7 @@ def compressor(bytes data, int ws=W, int lb=L):
 
     return bytes(out)
 
+# get the original data back from the tokens
 def decompressor(data):
     cdef bytearray out = bytearray()
     cdef int i = 0
